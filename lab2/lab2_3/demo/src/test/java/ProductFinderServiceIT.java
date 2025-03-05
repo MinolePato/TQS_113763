@@ -1,12 +1,14 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
-import com.example.*;;
+import com.example.Product;
+import com.example.ProductFinderService;
+import com.example.SimpleHttpClient;
+;
 
 
 public class ProductFinderServiceIT {

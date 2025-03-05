@@ -1,0 +1,25 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.example.persistence.repo;
+
+import java.util.List;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.example.persistence.model.Car;
+
+/**
+ *
+ * @author gino
+ */
+public interface CarRepository extends CrudRepository<Car, Long> {
+
+    List<Car> fildAll();
+
+    Car findByCarId(long carid);
+
+
+}
