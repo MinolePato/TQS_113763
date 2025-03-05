@@ -1,4 +1,4 @@
-com/example/ProductFinderService.class
-com/example/Product.class
-com/example/ISimpleHttpClient.class
-com/example/SimpleHttpClient.class
+com\example\ProductFinderService.class
+com\example\ISimpleHttpClient.class
+com\example\SimpleHttpClient.class
+com\example\Product.class

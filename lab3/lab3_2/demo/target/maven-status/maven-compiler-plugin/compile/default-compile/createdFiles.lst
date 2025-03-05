@@ -1,0 +1,5 @@
+com\example\controller\CarController.class
+main\java\com\example\service\CarManagerService.class
+com\example\persistence\model\Car.class
+com\example\config\Application.class
+com\example\persistence\repo\CarRepository.class

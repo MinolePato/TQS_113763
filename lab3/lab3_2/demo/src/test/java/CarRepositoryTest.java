@@ -1,108 +1,81 @@
-
-
-
-
-import com.example.data.Employee;
-import com.example.data.EmployeeRepository;
-import com.example.persistence.model.*;
-
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import com.example.persistence.model.Car;
+import com.example.persistence.repo.CarRepository;
 
-public class CarRepositoryTest {
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+// @TestPropertySource(locations = "application-integrationtest.properties") // Para testes com BD real
+class CarRepositoryTest {
+
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private EmployeeRepository employeeRepository;
+    private CarRepository carRepository;
 
-    @Test
-    void whenFindAlexByName_thenReturnAlexEmployee() {
-        // arrange a new employee and insert into db
-        Employee alex = new Employee("alex", "alex@deti.com");
-        entityManager.persistAndFlush(alex); //ensure data is persisted at this point
-
-        // test the query method
-        Employee found = employeeRepository.findByName(alex.getName());
-        assertThat(found).isEqualTo(alex);
+    @AfterEach
+    void tearDown() {
+        carRepository.deleteAll();
     }
 
     @Test
-    void whenCreateAlex_thenReturnAlexEmployee() {
+    @DisplayName("Deve encontrar um carro pelo ID")
+    void whenFindByCarId_thenReturnCar() {
+        Car car = new Car("Toyota", "Corolla");
+        entityManager.persistAndFlush(car);
 
-        // arrange a new employee and insert into db
-        Employee persistedAlex = entityManager.persistFlushFind( new Employee("alex", "alex@deti.com")); //ensure data is persisted at this point
-
-        // test the query method of interest
-        Employee found = employeeRepository.findByName("alex");
-        assertThat(found).isNotNull().
-                extracting(Employee::getName).isEqualTo(persistedAlex.getName());
-    }
-
-
-    @Test
-    void whenInvalidEmployeeName_thenReturnNull() {
-        Employee fromDb = employeeRepository.findByName("Does Not Exist");
-        assertThat(fromDb).isNull();
+        Car found = carRepository.findByCarId(car.getId());
+        assertThat(found).isNotNull();
+        assertThat(found.getMaker()).isEqualTo(car.getMaker());
+        assertThat(found.getModel()).isEqualTo(car.getModel());
     }
 
     @Test
-    void whenFindEmployedByExistingId_thenReturnEmployee() {
-        Employee emp = new Employee("test", "test@deti.com");
-        entityManager.persistAndFlush(emp);
-
-        Employee fromDb = employeeRepository.findById(emp.getId()).orElse(null);
-        assertThat(fromDb).isNotNull();
-        assertThat(fromDb.getEmail()).isEqualTo(emp.getEmail());
+    @DisplayName("Deve retornar null ao procurar um ID inexistente")
+    void whenFindByInvalidCarId_thenReturnNull() {
+        Car found = carRepository.findByCarId(-1L);
+        assertThat(found).isNull();
     }
 
     @Test
-    void whenInvalidId_thenReturnNull() {
-        Employee fromDb = employeeRepository.findById(-111L).orElse(null);
-        assertThat(fromDb).isNull();
-    }
+    @DisplayName("Deve encontrar todos os carros")
+    void whenFindAll_thenReturnAllCars() {
+        Car car1 = new Car("Honda", "Civic");
+        Car car2 = new Car("Ford", "Focus");
 
-    @Test
-    void givenSetOfEmployees_whenFindAll_thenReturnAllEmployees() {
-        Employee alex = new Employee("alex", "alex@deti.com");
-        Employee ron = new Employee("ron", "ron@deti.com");
-        Employee bob = new Employee("bob", "bob@deti.com");
-
-        entityManager.persist(alex);
-        entityManager.persist(bob);
-        entityManager.persist(ron);
+        entityManager.persist(car1);
+        entityManager.persist(car2);
         entityManager.flush();
 
-        List<Employee> allEmployees = employeeRepository.findAll();
-        assertThat(allEmployees).hasSize(3).extracting(Employee::getName).containsOnly(alex.getName(), ron.getName(), bob.getName());
+        List<Car> allCars = carRepository.findAll();
+        assertThat(allCars).hasSize(2).extracting(Car::getMaker).contains("Honda", "Ford");
     }
 
-
-    @DisplayName("Should find employees whose email ends with a specific domain")
     @Test
-    void testFindEmplyeedByOrganizationDomain() {
-        // Given
-        entityManager.persist(new Employee("alex", "alex@deti.com"));
-        entityManager.persist(new Employee("ron", "ron@ua.pt"));
-        entityManager.persist(new Employee("bob", "bob@ua.pt"));
+    @DisplayName("Deve encontrar carros por fabricante")
+    void whenFindByMaker_thenReturnCars() {
+        Car car1 = new Car("BMW", "X5");
+        Car car2 = new Car("BMW", "320i");
+        Car car3 = new Car("Audi", "A4");
+
+        entityManager.persist(car1);
+        entityManager.persist(car2);
+        entityManager.persist(car3);
         entityManager.flush();
 
-        // When
-        List<Employee> results = employeeRepository.findEmplyeedByOrganizationDomain("ua.pt");
-
-        // Then
-        assertThat(results)
-                .hasSize(2)
-                .extracting(Employee::getEmail)
-                .containsExactlyInAnyOrder(
-                        "bob@ua.pt",
-                        "ron@ua.pt"
-                );
+        List<Car> bmwCars = (List<Car>) carRepository.findByMaker("BMW");
+        assertThat(bmwCars).hasSize(2).extracting(Car::getModel).contains("X5", "320i");
     }
+
 }
