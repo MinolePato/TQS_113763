@@ -1,51 +1,52 @@
+import java.time.Duration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import java.time.Duration;
-import java.util.List;
 
-public class SearchBookTest {
-    public static void main(String[] args) {
-        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
-        WebDriver driver = new ChromeDriver();
+import io.github.bonigarcia.wdm.WebDriverManager;
+class SearchBookTest {
+    WebDriver driver;
+    Wait<WebDriver> wait;
+
+    @BeforeAll
+    static void setupClass() {
+        WebDriverManager.chromedriver().setup();
+    }
+
+    @BeforeEach
+    void setup() {
+        ChromeOptions options = new ChromeOptions().setBinary("/usr/bin/brave-browser");
+        driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+    }
+
+    @AfterEach
+    void teardown() {
+        driver.quit();
+    }
+
+    @Test
+    void test() {
         driver.get("https://cover-bookstore.onrender.com/");
+        assertThat(driver.getTitle()).contains("Cover");
 
-        try {
-            // Locate the search input field using a well-defined selector
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement searchBox = wait.until(
-                ExpectedConditions.presenceOfElementLocated(By.cssSelector("[data-testid=book-search-input]"))
-            );
-            searchBox.sendKeys("Harry Potter" + Keys.RETURN);
+        WebElement searchElement = driver.findElement(By.cssSelector("[data-testid=book-search-input]"));
+        searchElement.sendKeys("Harry Potter");
+        searchElement.sendKeys(Keys.RETURN);
+        WebElement bookTitleElement = driver.findElement(By.cssSelector("[class=SearchList_bookTitle__1wo4a]"));
+        wait.until(b -> bookTitleElement.isDisplayed());
+        assertThat(bookTitleElement.getText()).contains("Harry Potter and the Sorcerer's Stone");
 
-            // Wait for search results to load
-            List<WebElement> results = wait.until(
-                ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("[data-testid=book-search-item]"))
-            );
-
-            // Check for the correct book in the search results
-            boolean bookFound = false;
-            for (WebElement result : results) {
-                String title = result.findElement(By.cssSelector("[data-testid=book-title]")).getText();
-                String author = result.findElement(By.cssSelector("[data-testid=book-author]")).getText();
-
-                if (title.contains("Harry Potter and the Sorcerer's Stone") && author.contains("J. K. Rowlling")) {
-                    bookFound = true;
-                    break;
-                }
-            }
-
-            if (bookFound) {
-                System.out.println("Test passed: Book found!");
-            } else {
-                throw new AssertionError("Expected book not found in search results");
-            }
-        } finally {
-            driver.quit();
-        }
     }
 }

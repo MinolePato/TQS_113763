@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: com.example.UntitledTestSuite.UntitledTestCase2
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.094 s <<< FAILURE! - in com.example.UntitledTestSuite.UntitledTestCase2
+testUntitledTestCase(com.example.UntitledTestSuite.UntitledTestCase2)  Time elapsed: 0.05 s  <<< ERROR!
+java.lang.IllegalStateException: The driver executable must exist: /home/francisco/Documents/TQS/Homework/TQS_113763/lab4/lab4_2/KR-exported-java-junit-maven-project
+	at com.example.UntitledTestSuite.UntitledTestCase2.setUp(UntitledTestCase2.java:27)
+
+testUntitledTestCase(com.example.UntitledTestSuite.UntitledTestCase2)  Time elapsed: 0.05 s  <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "org.openqa.selenium.WebDriver.quit()" because "this.driver" is null
+	at com.example.UntitledTestSuite.UntitledTestCase2.tearDown(UntitledTestCase2.java:106)
+
