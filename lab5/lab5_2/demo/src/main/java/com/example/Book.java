@@ -1,28 +1,35 @@
 package com.example;
-
-import java.util.Date;
  
+import java.util.Date;
+
 public class Book {
 	private final String title;
 	private final String author;
 	private final Date published;
- 
-	// constructors, getter, setter ommitted
-	public Book(String title, String author, Date published) {
-        this.title = title;
-        this.author = author;
-        this.published = published;
-    }
 
-    public String getTitle() {
-        return title;
-    }
+	public Book(final String title, final String author, final int year) {
+		this.title = title;
+		this.author = author;
 
-    public String getAuthor() {
-        return author;
-    }
+		final Date date = new Date();
+		date.setYear(year);
+		this.published = date;
+	}
 
-    public Date getPublished() {
-        return published;
-    }
+	public String getTitle() {
+		return title;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public Date getPublished() {
+		return published;
+	}
+
+	@Override
+	public String toString() {
+		return "Book [title=" + title + ", author=" + author + ", published=" + published + "]";
+	}
 }

@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+Test set: RunCucumberTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.152 s <<< FAILURE! - in RunCucumberTest
+User searches for "Harry Potter" book  Time elapsed: 1.053 s  <<< ERROR!
+org.openqa.selenium.SessionNotCreatedException: 
+Could not start a new session. Response code 500. Message: session not created
+from unknown error: no chrome binary at /usr/bin/brave-browser 
+Host info: host: 'francisco-HP-Laptop-15s-eq2xxx', ip: '127.0.1.1'
+Build info: version: '4.29.0', revision: '5fc1ec94cb'
+System info: os.name: 'Linux', os.arch: 'amd64', os.version: '6.8.0-52-generic', java.version: '21.0.6'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Command: [null, newSession {capabilities=[Capabilities {browserName: chrome, goog:chromeOptions: {args: [], binary: /usr/bin/brave-browser, extensions: []}}]}]
+
