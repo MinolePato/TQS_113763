@@ -19,6 +19,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,7 +88,7 @@ public class MealServiceTest {
         mealToSave.setDate(LocalDate.now());
         mealToSave.setTime(LocalTime.of(20, 0));
         mealToSave.setRestaurant(restaurant);
-        mealToSave.setNumberOfMeals(null); // Explicitly set to null
+        mealToSave.setNumberOfMeals(null); 
 
         Meal savedMeal = new Meal();
         savedMeal.setId(3L);
@@ -97,7 +98,7 @@ public class MealServiceTest {
         savedMeal.setDate(LocalDate.now());
         savedMeal.setTime(LocalTime.of(20, 0));
         savedMeal.setRestaurant(restaurant);
-        savedMeal.setNumberOfMeals(0); // Should be initialized to 0
+        savedMeal.setNumberOfMeals(0); 
 
         when(mealRepository.save(any(Meal.class))).thenReturn(savedMeal);
 
@@ -116,14 +117,14 @@ public class MealServiceTest {
         mealToSave.setName("New Meal");
         mealToSave.setPrice(20.99);
         mealToSave.setRestaurant(restaurant);
-        mealToSave.setNumberOfMeals(10); // Set to a value
+        mealToSave.setNumberOfMeals(10); 
 
         Meal savedMeal = new Meal();
         savedMeal.setId(3L);
         savedMeal.setName("New Meal");
         savedMeal.setPrice(20.99);
         savedMeal.setRestaurant(restaurant);
-        savedMeal.setNumberOfMeals(10); // Should remain 10
+        savedMeal.setNumberOfMeals(10); 
 
         when(mealRepository.save(any(Meal.class))).thenReturn(savedMeal);
 
@@ -137,23 +138,22 @@ public class MealServiceTest {
 
     @Test
     void getMealById_WithExistingId_ShouldReturnMeal() {
-        // Given
+
         when(mealRepository.findById(1L)).thenReturn(Optional.of(meal1));
 
-        // When
+
         Meal result = mealService.getMealById(1L);
 
-        // Then
+
         assertThat(result).isEqualTo(meal1);
         verify(mealRepository, times(1)).findById(1L);
     }
 
     @Test
     void getMealById_WithNonExistingId_ShouldThrowException() {
-        // Given
+
         when(mealRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // When/Then
         assertThatThrownBy(() -> mealService.getMealById(999L))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Refeição não encontrada");
@@ -163,7 +163,7 @@ public class MealServiceTest {
 
     @Test
     void updateMeal_WithExistingId_ShouldUpdateAndReturnMeal() {
-        // Given
+ 
         Meal updatedMeal = new Meal();
         updatedMeal.setName("Updated Name");
         updatedMeal.setPrice(25.99);
@@ -184,10 +184,10 @@ public class MealServiceTest {
         resultMeal.setName("Updated Name");
         resultMeal.setPrice(25.99);
         resultMeal.setNumberOfMeals(8);
-        resultMeal.setDescrição("Description"); // Shouldn't change
-        resultMeal.setDate(LocalDate.now()); // Shouldn't change
-        resultMeal.setTime(LocalTime.NOON); // Shouldn't change
-        resultMeal.setRestaurant(restaurant); // Shouldn't change
+        resultMeal.setDescrição("Description"); 
+        resultMeal.setDate(LocalDate.now());
+        resultMeal.setTime(LocalTime.NOON); 
+        resultMeal.setRestaurant(restaurant); 
 
         when(mealRepository.findById(1L)).thenReturn(Optional.of(existingMeal));
         when(mealRepository.save(any(Meal.class))).thenReturn(resultMeal);
@@ -210,13 +210,13 @@ public class MealServiceTest {
         Meal updatedMeal = new Meal();
         updatedMeal.setName("Updated Name");
         updatedMeal.setPrice(25.99);
-        updatedMeal.setNumberOfMeals(null); // Null, should not update
+        updatedMeal.setNumberOfMeals(null); 
 
         Meal existingMeal = new Meal();
         existingMeal.setId(1L);
         existingMeal.setName("Original Name");
         existingMeal.setPrice(20.99);
-        existingMeal.setNumberOfMeals(5); // Original value
+        existingMeal.setNumberOfMeals(5); 
         existingMeal.setDescrição("Description");
         existingMeal.setRestaurant(restaurant);
 
@@ -224,7 +224,7 @@ public class MealServiceTest {
         resultMeal.setId(1L);
         resultMeal.setName("Updated Name");
         resultMeal.setPrice(25.99);
-        resultMeal.setNumberOfMeals(5); // Should stay the same
+        resultMeal.setNumberOfMeals(5); 
         resultMeal.setDescrição("Description");
         resultMeal.setRestaurant(restaurant);
 
@@ -235,7 +235,7 @@ public class MealServiceTest {
         Meal result = mealService.updateMeal(1L, updatedMeal);
 
         // Then
-        assertThat(result.getNumberOfMeals()).isEqualTo(5); // Should remain unchanged
+        assertThat(result.getNumberOfMeals()).isEqualTo(5); 
         verify(mealRepository, times(1)).save(argThat(meal -> 
             meal.getName().equals("Updated Name") &&
             meal.getPrice() == 25.99 &&
@@ -255,4 +255,22 @@ public class MealServiceTest {
         assertThat(result).contains(meal1, meal2);
         verify(mealRepository, times(1)).findByRestaurantId(1L);
     }
+    @Test
+void saveMeal_WithNegativePrice_ShouldThrowException() {
+    // Given
+    Meal mealToSave = new Meal();
+    mealToSave.setName("Invalid Meal");
+    mealToSave.setDescrição("This meal has a negative price");
+    mealToSave.setPrice(-5.99); // preço inválido
+    mealToSave.setNumberOfMeals(10);
+    mealToSave.setRestaurant(restaurant);
+
+    // Then
+    assertThatThrownBy(() -> mealService.saveMeal(mealToSave))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Preço não pode ser negativo");
+
+    verify(mealRepository, never()).save(any());
+}
+
 }

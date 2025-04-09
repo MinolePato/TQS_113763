@@ -18,7 +18,6 @@ export const options = {
   },
 };
 
-// Initialize variables that will store IDs for testing
 let restaurantId = null;
 let mealId = null;
 

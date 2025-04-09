@@ -101,8 +101,8 @@ public class CacheTest {
         // Arrange
         cache.addWeatherDataToCache("key1", "data1", 30000);
         cache.addWeatherDataToCache("key2", "data2", 30000);
-        cache.getWeatherDataFromCache("key1"); // Incrementar hits e requests
-        cache.getWeatherDataFromCache("nonExistent"); // Incrementar misses e requests
+        cache.getWeatherDataFromCache("key1"); 
+        cache.getWeatherDataFromCache("nonExistent"); 
 
         // Pre-condition check
         assertEquals(1, cache.getHits());
@@ -129,14 +129,14 @@ public class CacheTest {
 
     @Test
     void getAverageRemainingTtlSeconds_WithItems_ReturnsCorrectAverage() throws InterruptedException {
-        // Arrange
-        cache.addWeatherDataToCache("key1", "data1", 10000); // 10 segundos
-        cache.addWeatherDataToCache("key2", "data2", 20000); // 20 segundos
 
-        // Act
+        cache.addWeatherDataToCache("key1", "data1", 10000); 
+        cache.addWeatherDataToCache("key2", "data2", 20000); 
+
+
         long ttlSeconds = cache.getAverageRemainingTtlSeconds();
 
-        // Assert - Verifica se está entre valores esperados (com margem para execução)
+
         assertTrue(ttlSeconds > 0 && ttlSeconds <= 15, 
                    "Expected TTL between 0 and 15 seconds, but got " + ttlSeconds);
     }

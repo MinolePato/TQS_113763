@@ -25,7 +25,13 @@ public class MealService {
 
     public Meal saveMeal(Meal meal) {
         logger.info("Saving meal: {}", meal.getName());
-        
+        if (meal.getPrice() < 0) {
+            throw new IllegalArgumentException("Preço não pode ser negativo");
+        }
+    
+        if (meal.getNumberOfMeals() == null) {
+            meal.setNumberOfMeals(0);
+        }
         // Initialize numberOfMeals if not set
         if (meal.getNumberOfMeals() == null) {
             meal.setNumberOfMeals(0);
