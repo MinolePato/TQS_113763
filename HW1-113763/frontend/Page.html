@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Booking System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav {
+            background-color: #005599;
+            padding: 10px 0;
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #003366;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        form {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #003366;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #004d99;
+        }
+        .meal-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: white;
+        }
+        .meal-info {
+            float: left;
+            width: 70%;
+        }
+        .weather-info {
+            float: right;
+            width: 25%;
+            text-align: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        .weather-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .success-message, .error-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success-message {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error-message {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Meal Booking System</h1>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#" onclick="openTab('view-meals')">View Meals</a></li>
+                <li><a href="#" onclick="openTab('make-reservation')">Make Reservation</a></li>
+                <li><a href="#" onclick="openTab('check-reservation')">Check Reservation</a></li>
+                <li><a href="#" onclick="openTab('staff-verification')">Staff Verification</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- View Meals Tab -->
+        <div id="view-meals" class="tab-content active">
+            <h2>Available Meals</h2>
+            <div class="form-group">
+                <label for="restaurant-select">Select Restaurant:</label>
+                <select id="restaurant-select" onchange="loadMeals()">
+                    <option value="">-- Select a Restaurant --</option>
+                    <!-- Restaurants will be loaded here -->
+                </select>
+            </div>
+            
+            <div id="meals-container">
+                <!-- Meals will be loaded here -->
+                <p>Please select a restaurant to view available meals.</p>
+            </div>
+        </div>
+        
+        <!-- Make Reservation Tab -->
+        <div id="make-reservation" class="tab-content">
+            <h2>Make a Reservation</h2>
+            <form id="reservation-form">
+                <div class="form-group">
+                    <label for="reservation-restaurant">Restaurant:</label>
+                    <select id="reservation-restaurant" required onchange="loadMealsForReservation()">
+                        <option value="">-- Select a Restaurant --</option>
+                        <!-- Restaurants will be loaded here -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reservation-meal">Meal:</label>
+                    <select id="reservation-meal" required>
+                        <option value="">-- First Select a Restaurant --</option>
+                        <!-- Meals will be loaded here -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customer-name">Your Name:</label>
+                    <input type="text" id="customer-name" required>
+                </div>
+                
+                <button type="submit">Book Reservation</button>
+            </form>
+            
+            <div id="reservation-result" style="margin-top: 20px;"></div>
+        </div>
+        
+        <!-- Check Reservation Tab -->
+        <div id="check-reservation" class="tab-content">
+            <h2>Check Your Reservation</h2>
+            <form id="check-reservation-form">
+                <div class="form-group">
+                    <label for="reservation-code">Reservation Code:</label>
+                    <input type="text" id="reservation-code" required>
+                </div>
+                
+                <button type="submit">Check Reservation</button>
+            </form>
+            
+            <div id="reservation-details" style="margin-top: 20px;"></div>
+        </div>
+        
+        <!-- Staff Verification Tab -->
+        <div id="staff-verification" class="tab-content">
+            <h2>Staff Verification</h2>
+            <form id="staff-verification-form">
+                <div class="form-group">
+                    <label for="verify-code">Reservation Code:</label>
+                    <input type="text" id="verify-code" required>
+                </div>
+                
+                <button type="submit">Verify Reservation</button>
+            </form>
+            
+            <div id="verification-result" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        const API_BASE_URL = 'http://localhost:8080/Api';
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRestaurants();
+            
+            // Set up form submissions
+            document.getElementById('reservation-form').addEventListener('submit', makeReservation);
+            document.getElementById('check-reservation-form').addEventListener('submit', checkReservation);
+            document.getElementById('staff-verification-form').addEventListener('submit', verifyReservation);
+        });
+        
+        // Tab navigation
+        function openTab(tabId) {
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // Load all restaurants
+        function loadRestaurants() {
+            fetch(`${API_BASE_URL}/restaurants`)
+                .then(response => response.json())
+                .then(restaurants => {
+                    const mainSelect = document.getElementById('restaurant-select');
+                    const reservationSelect = document.getElementById('reservation-restaurant');
+                    
+                    // Clear existing options
+                    mainSelect.innerHTML = '<option value="">-- Select a Restaurant --</option>';
+                    reservationSelect.innerHTML = '<option value="">-- Select a Restaurant --</option>';
+                    
+                    // Add new options
+                    restaurants.forEach(restaurant => {
+                        const option = document.createElement('option');
+                        option.value = restaurant.id;
+                        option.textContent = restaurant.name;
+                        
+                        const optionClone = option.cloneNode(true);
+                        
+                        mainSelect.appendChild(option);
+                        reservationSelect.appendChild(optionClone);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading restaurants:', error);
+                    alert('Failed to load restaurants. Please try again later.');
+                });
+        }
+        
+        // Load meals for a specific restaurant
+        function loadMeals() {
+            const restaurantId = document.getElementById('restaurant-select').value;
+            if (!restaurantId) {
+                document.getElementById('meals-container').innerHTML = '<p>Please select a restaurant to view available meals.</p>';
+                return;
+            }
+            
+            fetch(`${API_BASE_URL}/restaurants/${restaurantId}/menus`)
+                .then(response => response.json())
+                .then(meals => {
+                    const mealsContainer = document.getElementById('meals-container');
+                    mealsContainer.innerHTML = '';
+                    
+                    if (meals.length === 0) {
+                        mealsContainer.innerHTML = '<p>No meals available for this restaurant.</p>';
+                        return;
+                    }
+                    
+                    meals.forEach(meal => {
+                        // Fetch weather for this meal
+                        fetch(`${API_BASE_URL}/meals/${meal.id}/weather`)
+                            .then(response => response.json())
+                            .then(weather => {
+                                const mealCard = createMealCard(meal, weather);
+                                mealsContainer.appendChild(mealCard);
+                            })
+                            .catch(error => {
+                                console.error(`Error loading weather for meal ${meal.id}:`, error);
+                                const mealCard = createMealCard(meal, null);
+                                mealsContainer.appendChild(mealCard);
+                            });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading meals:', error);
+                    document.getElementById('meals-container').innerHTML = '<p class="error-message">Failed to load meals. Please try again later.</p>';
+                });
+        }
+        
+        // Create a meal card with weather information
+        function createMealCard(meal, weather) {
+            const card = document.createElement('div');
+            card.className = 'meal-card clearfix';
+            
+            // Meal information
+            const mealInfo = document.createElement('div');
+            mealInfo.className = 'meal-info';
+            mealInfo.innerHTML = `
+                <h3>${meal.name}</h3>
+                <p><strong>Price:</strong> €${meal.price.toFixed(2)}</p>
+                <p><strong>Date:</strong> ${formatDate(meal.date)}</p>
+                <p><strong>Time:</strong> ${meal.time}</p>
+            `;
+            
+            // Weather information
+            const weatherInfo = document.createElement('div');
+            weatherInfo.className = 'weather-info';
+            
+            if (weather) {
+                const mainWeather = weather.weather ? weather.weather[0] : null;
+                const temp = weather.main ? weather.main.temp : null;
+                
+                let weatherIcon = '☁️'; // Default cloud icon
+                if (mainWeather) {
+                    if (mainWeather.main === 'Clear') weatherIcon = '☀️';
+                    else if (mainWeather.main === 'Rain') weatherIcon = '🌧️';
+                    else if (mainWeather.main === 'Snow') weatherIcon = '❄️';
+                    else if (mainWeather.main === 'Thunderstorm') weatherIcon = '⛈️';
+                }
+                
+                weatherInfo.innerHTML = `
+                    <div class="weather-icon">${weatherIcon}</div>
+                    <p>${mainWeather ? mainWeather.description : 'Weather data unavailable'}</p>
+                    <p>${temp ? temp + '°C' : ''}</p>
+                `;
+            } else {
+                weatherInfo.innerHTML = `
+                    <div class="weather-icon">❓</div>
+                    <p>Weather data unavailable</p>
+                `;
+            }
+            
+            card.appendChild(mealInfo);
+            card.appendChild(weatherInfo);
+            
+            return card;
+        }
+        
+        // Load meals for the reservation form
+        function loadMealsForReservation() {
+            const restaurantId = document.getElementById('reservation-restaurant').value;
+            const mealSelect = document.getElementById('reservation-meal');
+            
+            // Reset meal select
+            mealSelect.innerHTML = '<option value="">-- Select a Meal --</option>';
+            
+            if (!restaurantId) {
+                return;
+            }
+            
+            fetch(`${API_BASE_URL}/restaurants/${restaurantId}/menus`)
+                .then(response => response.json())
+                .then(meals => {
+                    if (meals.length === 0) {
+                        mealSelect.innerHTML = '<option value="">No meals available</option>';
+                        return;
+                    }
+                    
+                    meals.forEach(meal => {
+                        const option = document.createElement('option');
+                        option.value = meal.id;
+                        option.textContent = `${meal.name} - €${meal.price.toFixed(2)} - ${formatDate(meal.date)} at ${meal.time}`;
+                        mealSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading meals for reservation:', error);
+                    mealSelect.innerHTML = '<option value="">Error loading meals</option>';
+                });
+        }
+        
+        // Make a reservation
+        function makeReservation(event) {
+            event.preventDefault();
+            
+            const restaurantId = document.getElementById('reservation-restaurant').value;
+            const mealId = document.getElementById('reservation-meal').value;
+            const customerName = document.getElementById('customer-name').value;
+            
+            if (!restaurantId || !mealId || !customerName) {
+                document.getElementById('reservation-result').innerHTML = '<p class="error-message">Please fill in all fields.</p>';
+                return;
+            }
+            
+            const reservation = {
+                restaurant: { id: restaurantId },
+                meal: { id: mealId },
+                customerName: customerName
+            };
+            
+            fetch(`${API_BASE_URL}/reservations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reservation)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to make reservation');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('reservation-result').innerHTML = `
+                        <div class="success-message">
+                            <h3>Reservation Successful!</h3>
+                            <p><strong>Reservation Code:</strong> ${data.reservationCode}</p>
+                            <p>Please save this code to check or cancel your reservation later.</p>
+                        </div>
+                    `;
+                    
+                    // Reset form
+                    document.getElementById('reservation-form').reset();
+                })
+                .catch(error => {
+                    console.error('Error making reservation:', error);
+                    document.getElementById('reservation-result').innerHTML = '<p class="error-message">Failed to make reservation. Please try again later.</p>';
+                });
+        }
+        
+        // Check a reservation
+        function checkReservation(event) {
+            event.preventDefault();
+            
+            const reservationCode = document.getElementById('reservation-code').value;
+            
+            if (!reservationCode) {
+                document.getElementById('reservation-details').innerHTML = '<p class="error-message">Please enter a reservation code.</p>';
+                return;
+            }
+            
+            fetch(`${API_BASE_URL}/reservations/${reservationCode}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Reservation not found');
+                    }
+                    return response.json();
+                })
+                .then(reservation => {
+                    // Fetch meal details
+                    return fetch(`${API_BASE_URL}/meals/${reservation.meal.id}`)
+                        .then(response => response.json())
+                        .then(meal => {
+                            // Fetch restaurant details
+                            return fetch(`${API_BASE_URL}/restaurants/${reservation.restaurant.id}`)
+                                .then(response => response.json())
+                                .then(restaurant => {
+                                    return { reservation, meal, restaurant };
+                                });
+                        });
+                })
+                .then(data => {
+                    const { reservation, meal, restaurant } = data;
+                    
+                    document.getElementById('reservation-details').innerHTML = `
+                        <div class="meal-card">
+                            <h3>Reservation Details</h3>
+                            <p><strong>Reservation Code:</strong> ${reservation.reservationCode}</p>
+                            <p><strong>Customer Name:</strong> ${reservation.customerName}</p>
+                            <p><strong>Restaurant:</strong> ${restaurant.name}</p>
+                            <p><strong>Meal:</strong> ${meal.name}</p>
+                            <p><strong>Date:</strong> ${formatDate(meal.date)}</p>
+                            <p><strong>Time:</strong> ${meal.time}</p>
+                            <p><strong>Status:</strong> ${reservation.checkedIn ? 'Checked In' : 'Not Checked In'}</p>
+                            <button onclick="cancelReservation('${reservation.reservationCode}')">Cancel Reservation</button>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error checking reservation:', error);
+                    document.getElementById('reservation-details').innerHTML = '<p class="error-message">Reservation not found or an error occurred.</p>';
+                });
+        }
+        
+        // Cancel a reservation
+        function cancelReservation(reservationCode) {
+            if (!confirm('Are you sure you want to cancel this reservation?')) {
+                return;
+            }
+            
+            fetch(`${API_BASE_URL}/reservations/${reservationCode}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to cancel reservation');
+                    }
+                    
+                    document.getElementById('reservation-details').innerHTML = '<p class="success-message">Reservation successfully cancelled.</p>';
+                    document.getElementById('check-reservation-form').reset();
+                })
+                .catch(error => {
+                    console.error('Error cancelling reservation:', error);
+                    document.getElementById('reservation-details').innerHTML += '<p class="error-message">Failed to cancel reservation. Please try again later.</p>';
+                });
+        }
+        
+        // Verify a reservation (staff function)
+        function verifyReservation(event) {
+            event.preventDefault();
+            
+            const reservationCode = document.getElementById('verify-code').value;
+            
+            if (!reservationCode) {
+                document.getElementById('verification-result').innerHTML = '<p class="error-message">Please enter a reservation code.</p>';
+                return;
+            }
+            
+            // First check if reservation exists
+            fetch(`${API_BASE_URL}/reservations/${reservationCode}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Reservation not found');
+                    }
+                    return response.json();
+                })
+                .then(reservation => {
+                    if (reservation.checkedIn) {
+                        document.getElementById('verification-result').innerHTML = '<p class="error-message">This reservation has already been checked in.</p>';
+                        return;
+                    }
+                    
+                    // If reservation exists and not checked in, perform check-in
+                    return fetch(`${API_BASE_URL}/reservations/${reservationCode}/check-in`, {
+                        method: 'POST'
+                    })
+                        .then(response => response.text())
+                        .then(result => {
+                            if (result.includes('sucesso')) {
+                                document.getElementById('verification-result').innerHTML = '<p class="success-message">Check-in successful! The customer can now proceed.</p>';
+                                document.getElementById('staff-verification-form').reset();
+                            } else {
+                                document.getElementById('verification-result').innerHTML = '<p class="error-message">Check-in failed. Please try again.</p>';
+                            }
+                        });
+                })
+                .catch(error => {
+                    console.error('Error verifying reservation:', error);
+                    document.getElementById('verification-result').innerHTML = '<p class="error-message">Reservation not found or an error occurred.</p>';
+                });
+        }
+        
+        // Helper function to format date
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-PT');
+        }
+    </script>
+</body>
+</html>
