@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.example.demo.services.WeatherServiceTest
--------------------------------------------------------------------------------
-Tests run: 9, Failures: 0, Errors: 0, Skipped: 2, Time elapsed: 0.307 s - in com.example.demo.services.WeatherServiceTest
