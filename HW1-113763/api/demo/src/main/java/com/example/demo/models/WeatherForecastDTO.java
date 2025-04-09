@@ -3,8 +3,18 @@ package com.example.demo.models;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Embeddable
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class WeatherForecastDTO {
     private LocalDateTime dateTime;
     private double temperature;
@@ -13,15 +23,4 @@ public class WeatherForecastDTO {
     private double windSpeed;
     private int timestamp;
 
-    public WeatherForecastDTO() {
-    }
-
-    public WeatherForecastDTO(LocalDateTime dateTime, double temperature, String weatherDescription,
-            int cloudPercentage, double windSpeed, int timestamp) {
-        this.dateTime = dateTime;
-        this.temperature = temperature;
-        this.weatherDescription = weatherDescription;
-        this.cloudPercentage = cloudPercentage;
-        this.windSpeed = windSpeed;
-        this.timestamp = timestamp;
-    }}
+   }

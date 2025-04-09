@@ -317,10 +317,12 @@
                     }
                     
                     meals.forEach(meal => {
+                        console.log(meal)
                         // Fetch weather for this meal
                         fetch(`${API_BASE_URL}/meals/${meal.id}/weather`)
                             .then(response => response.json())
                             .then(weather => {
+                            console.log(weather)
                                 const mealCard = createMealCard(meal, weather);
                                 mealsContainer.appendChild(mealCard);
                             })
@@ -348,6 +350,7 @@
             mealInfo.innerHTML = `
                 <h3>${meal.name}</h3>
                 <p><strong>Price:</strong> €${meal.price.toFixed(2)}</p>
+                <p th:class="${meal.numberOfMeals > 5} ? 'text-success' : 'text-danger'"><strong>Number of available meals :</strong> ${meal.numberOfMeals}</p>
                 <p><strong>Date:</strong> ${formatDate(meal.date)}</p>
                 <p><strong>Time:</strong> ${meal.time}</p>
             `;
@@ -359,6 +362,8 @@
             if (weather) {
                 const mainWeather = weather.weather ? weather.weather[0] : null;
                 const temp = weather.main ? weather.main.temp : null;
+                const hum = weather.main ? weather.main.humidity : null;
+                const wind = weather.main ? weather.wind.speed : null;
                 
                 let weatherIcon = '☁️'; // Default cloud icon
                 if (mainWeather) {
@@ -371,7 +376,10 @@
                 weatherInfo.innerHTML = `
                     <div class="weather-icon">${weatherIcon}</div>
                     <p>${mainWeather ? mainWeather.description : 'Weather data unavailable'}</p>
-                    <p>${temp ? temp + '°C' : ''}</p>
+                    
+                    <p>Temperature:${temp ? temp + '°C' : ''}</p>
+                    <p>WindSped:${wind ? wind + 'Km/s' : ''}</p>
+                    <p>humidity:${hum ? hum + '%' : ''}</p>
                 `;
             } else {
                 weatherInfo.innerHTML = `
@@ -452,11 +460,18 @@
                     return response.json();
                 })
                 .then(data => {
+                    console.log(data)
                     document.getElementById('reservation-result').innerHTML = `
                         <div class="success-message">
                             <h3>Reservation Successful!</h3>
                             <p><strong>Reservation Code:</strong> ${data.reservationCode}</p>
+                            <p><strong>Customer Name:</strong> ${customerName}</p>
+                             <p><strong>Status:</strong> ${data.status }</p>
                             <p>Please save this code to check or cancel your reservation later.</p>
+                         
+
+                            
+                       
                         </div>
                     `;
                     
@@ -512,7 +527,7 @@
                             <p><strong>Meal:</strong> ${meal.name}</p>
                             <p><strong>Date:</strong> ${formatDate(meal.date)}</p>
                             <p><strong>Time:</strong> ${meal.time}</p>
-                            <p><strong>Status:</strong> ${reservation.checkedIn ? 'Checked In' : 'Not Checked In'}</p>
+                            <p><strong>Status:</strong> ${reservation.status }</p>
                             <button onclick="cancelReservation('${reservation.reservationCode}')">Cancel Reservation</button>
                         </div>
                     `;
@@ -525,26 +540,48 @@
         
         // Cancel a reservation
         function cancelReservation(reservationCode) {
-            if (!confirm('Are you sure you want to cancel this reservation?')) {
+    if (!confirm('Are you sure you want to cancel this reservation?')) {
+        return;
+    }
+
+    // Primeiro vamos buscar os dados da reserva para verificar o status
+    fetch(`${API_BASE_URL}/reservations/${reservationCode}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Reservation not found');
+            }
+            return response.json();
+        })
+        .then(reservation => {
+            if (reservation.status === 'VERIFIED'||reservation.status === 'CANCELED') {
+                document.getElementById('reservation-details').innerHTML += `
+                    <p class="error-message">Cannot cancel a ${reservation.status} reservation.</p>
+                `;
                 return;
             }
-            
-            fetch(`${API_BASE_URL}/reservations/${reservationCode}`, {
+
+            // Só continua com o cancelamento se não for VERIFIED
+            return fetch(`${API_BASE_URL}/reservations/${reservationCode}`, {
                 method: 'DELETE'
             })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to cancel reservation');
                     }
-                    
-                    document.getElementById('reservation-details').innerHTML = '<p class="success-message">Reservation successfully cancelled.</p>';
+
+                    document.getElementById('reservation-details').innerHTML = `
+                        <p class="success-message">Reservation successfully cancelled.</p>
+                    `;
                     document.getElementById('check-reservation-form').reset();
-                })
-                .catch(error => {
-                    console.error('Error cancelling reservation:', error);
-                    document.getElementById('reservation-details').innerHTML += '<p class="error-message">Failed to cancel reservation. Please try again later.</p>';
                 });
-        }
+        })
+        .catch(error => {
+            console.error('Error cancelling reservation:', error);
+            document.getElementById('reservation-details').innerHTML += `
+                <p class="error-message">Failed to cancel reservation. Please try again later.</p>
+            `;
+        });
+}
         
         // Verify a reservation (staff function)
         function verifyReservation(event) {
@@ -577,17 +614,18 @@
                     })
                         .then(response => response.text())
                         .then(result => {
+                            console.log(result)
                             if (result.includes('sucesso')) {
                                 document.getElementById('verification-result').innerHTML = '<p class="success-message">Check-in successful! The customer can now proceed.</p>';
                                 document.getElementById('staff-verification-form').reset();
                             } else {
-                                document.getElementById('verification-result').innerHTML = '<p class="error-message">Check-in failed. Please try again.</p>';
+                                document.getElementById('verification-result').innerHTML  =`<p class="error-message"> Check-in Failed! The reservation is canceled or alredy registered</p>`;
                             }
                         });
                 })
                 .catch(error => {
                     console.error('Error verifying reservation:', error);
-                    document.getElementById('verification-result').innerHTML = '<p class="error-message">Reservation not found or an error occurred.</p>';
+                    document.getElementById('verification-result').innerHTML = '<p class="error-message">Reservation not found.</p>';
                 });
         }
         

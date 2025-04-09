@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class MealService {
-    private static final Logger logger = LoggerFactory.getLogger(MealService.class);  // Logger criado
+    private static final Logger logger = LoggerFactory.getLogger(MealService.class);
 
     private final MealRepository mealRepository;
 
@@ -25,6 +25,13 @@ public class MealService {
 
     public Meal saveMeal(Meal meal) {
         logger.info("Saving meal: {}", meal.getName());
+        
+        // Initialize numberOfMeals if not set
+        if (meal.getNumberOfMeals() == null) {
+            meal.setNumberOfMeals(0);
+            logger.info("Initialized numberOfMeals to 0 for meal: {}", meal.getName());
+        }
+        
         return mealRepository.save(meal);
     }
 
@@ -42,6 +49,14 @@ public class MealService {
         Meal existingMeal = getMealById(mealId);
         existingMeal.setName(meal.getName());
         existingMeal.setPrice(meal.getPrice());
+        
+        // Update numberOfMeals if provided
+        if (meal.getNumberOfMeals() != null) {
+            existingMeal.setNumberOfMeals(meal.getNumberOfMeals());
+            logger.info("Updated numberOfMeals to {} for meal: {}", 
+                       meal.getNumberOfMeals(), existingMeal.getName());
+        }
+        
         return mealRepository.save(existingMeal);
     }
 

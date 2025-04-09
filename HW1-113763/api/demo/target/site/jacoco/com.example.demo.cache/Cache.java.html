@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Cache.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Meals</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.cache</a> &gt; <span class="el_source">Cache.java</span></div><h1>Cache.java</h1><pre class="source lang-java linenums">package com.example.demo.cache;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+@Component
+public class Cache {
+<span class="fc" id="L11">    private static Logger logger = LogManager.getLogger(Cache.class);</span>
+<span class="fc" id="L12">    private final ConcurrentHashMap&lt;String, CacheItem&gt; cacheMap = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L13">    private int hits = 0;</span>
+<span class="fc" id="L14">    private int misses = 0;</span>
+<span class="fc" id="L15">    private int requests = 0;</span>
+
+<span class="fc" id="L17">    public Cache() {}</span>
+
+    public int getHits() {
+<span class="fc" id="L20">        return hits;</span>
+    }
+
+    public void incrementHits() {
+<span class="fc" id="L24">        this.hits++;</span>
+<span class="fc" id="L25">    }</span>
+
+    public int getMisses() {
+<span class="fc" id="L28">        return misses;</span>
+    }
+
+    public void incrementMisses() {
+<span class="fc" id="L32">        this.misses++;</span>
+<span class="fc" id="L33">    }</span>
+
+    public int getRequests() {
+<span class="fc" id="L36">        return requests;</span>
+    }
+
+    public void incrementRequests() {
+<span class="fc" id="L40">        this.requests++;</span>
+<span class="fc" id="L41">    }</span>
+
+    public void addWeatherDataToCache(String key, Object data, long ttl) {
+<span class="fc" id="L44">        cacheMap.put(key, new CacheItem(data, ttl));</span>
+<span class="fc" id="L45">        logger.info(&quot;Added to cache: {} with TTL of {}ms&quot;, key, ttl);</span>
+<span class="fc" id="L46">    }</span>
+
+    // Movido do WeatherService
+    public Object getWeatherDataFromCache(String key) {
+<span class="fc" id="L50">        CacheItem item = cacheMap.get(key);</span>
+<span class="fc bfc" id="L51" title="All 4 branches covered.">        if (item != null &amp;&amp; !item.isExpired()) {</span>
+<span class="fc" id="L52">            incrementHits();</span>
+<span class="fc" id="L53">            incrementRequests();</span>
+<span class="fc" id="L54">            logger.info(&quot;Cache hit for key: {}&quot;, key);</span>
+<span class="fc" id="L55">            return item.value;</span>
+        } else {
+<span class="fc" id="L57">            incrementMisses();</span>
+<span class="fc" id="L58">            incrementRequests();</span>
+<span class="fc" id="L59">            logger.info(&quot;Cache miss for key: {}&quot;, key);</span>
+<span class="fc" id="L60">            return null;</span>
+        }
+    }
+
+    public void clearCache() {
+<span class="fc" id="L65">        cacheMap.clear();</span>
+<span class="fc" id="L66">        hits = 0;</span>
+<span class="fc" id="L67">        misses = 0;</span>
+<span class="fc" id="L68">        requests = 0;</span>
+<span class="fc" id="L69">        logger.info(&quot;Cache cleared: hits = {}, misses = {}, requests = {}&quot;, hits, misses, requests);</span>
+<span class="fc" id="L70">    }</span>
+
+    public int getCacheSize() {
+<span class="fc" id="L73">        return cacheMap.size();</span>
+    }
+
+    public long getAverageRemainingTtlSeconds() {
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (cacheMap.isEmpty()) {</span>
+<span class="fc" id="L78">            return 0;</span>
+        }
+
+<span class="fc" id="L81">        long totalRemainingMs = 0;</span>
+<span class="fc" id="L82">        int count = 0;</span>
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        for (CacheItem item : cacheMap.values()) {</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">            if (!item.isExpired()) {</span>
+<span class="fc" id="L86">                totalRemainingMs += item.getRemainingTtl();</span>
+<span class="fc" id="L87">                count++;</span>
+            }
+<span class="fc" id="L89">        }</span>
+
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        return count &gt; 0 ? totalRemainingMs / count / 1000 : 0;</span>
+    }
+
+    private static class CacheItem {
+        Object value;
+        long expirationTime;
+
+<span class="fc" id="L98">        CacheItem(Object value, long ttl) {</span>
+<span class="fc" id="L99">            this.value = value;</span>
+<span class="fc" id="L100">            this.expirationTime = System.currentTimeMillis() + ttl;</span>
+<span class="fc" id="L101">        }</span>
+
+        boolean isExpired() {
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            return System.currentTimeMillis() &gt; expirationTime;</span>
+        }
+
+        long getRemainingTtl() {
+<span class="fc" id="L108">            return Math.max(0, expirationTime - System.currentTimeMillis());</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -15,9 +15,11 @@ public class Meal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String descrição;
     private double price;
     private LocalDate date;
     private LocalTime time;
+    private Integer numberOfMeals; // New field for tracking available meal count
     
     @ManyToOne
     private Restaurant restaurant;

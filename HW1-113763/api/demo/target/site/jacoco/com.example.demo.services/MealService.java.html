@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MealService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Meals</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.services</a> &gt; <span class="el_source">MealService.java</span></div><h1>MealService.java</h1><pre class="source lang-java linenums">package com.example.demo.services;
+
+import com.example.demo.models.Meal;
+import com.example.demo.repositories.MealRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class MealService {
+<span class="fc" id="L13">    private static final Logger logger = LoggerFactory.getLogger(MealService.class);</span>
+
+    private final MealRepository mealRepository;
+
+<span class="fc" id="L17">    public MealService(MealRepository mealRepository) {</span>
+<span class="fc" id="L18">        this.mealRepository = mealRepository;</span>
+<span class="fc" id="L19">    }</span>
+
+    public List&lt;Meal&gt; getAllMeals() {
+<span class="fc" id="L22">        logger.info(&quot;Fetching all meals.&quot;);</span>
+<span class="fc" id="L23">        return mealRepository.findAll();</span>
+    }
+
+    public Meal saveMeal(Meal meal) {
+<span class="fc" id="L27">        logger.info(&quot;Saving meal: {}&quot;, meal.getName());</span>
+        
+        // Initialize numberOfMeals if not set
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (meal.getNumberOfMeals() == null) {</span>
+<span class="fc" id="L31">            meal.setNumberOfMeals(0);</span>
+<span class="fc" id="L32">            logger.info(&quot;Initialized numberOfMeals to 0 for meal: {}&quot;, meal.getName());</span>
+        }
+        
+<span class="fc" id="L35">        return mealRepository.save(meal);</span>
+    }
+
+    public Meal getMealById(Long mealId) {
+<span class="fc" id="L39">        logger.info(&quot;Fetching meal with ID: {}&quot;, mealId);</span>
+<span class="fc" id="L40">        return mealRepository.findById(mealId)</span>
+<span class="fc" id="L41">                .orElseThrow(() -&gt; {</span>
+<span class="fc" id="L42">                    logger.warn(&quot;Meal with ID {} not found&quot;, mealId);</span>
+<span class="fc" id="L43">                    return new IllegalArgumentException(&quot;Refeição não encontrada&quot;);</span>
+                });
+    }
+
+    public Meal updateMeal(Long mealId, Meal meal) {
+<span class="fc" id="L48">        logger.info(&quot;Updating meal with ID: {}&quot;, mealId);</span>
+<span class="fc" id="L49">        Meal existingMeal = getMealById(mealId);</span>
+<span class="fc" id="L50">        existingMeal.setName(meal.getName());</span>
+<span class="fc" id="L51">        existingMeal.setPrice(meal.getPrice());</span>
+        
+        // Update numberOfMeals if provided
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (meal.getNumberOfMeals() != null) {</span>
+<span class="fc" id="L55">            existingMeal.setNumberOfMeals(meal.getNumberOfMeals());</span>
+<span class="fc" id="L56">            logger.info(&quot;Updated numberOfMeals to {} for meal: {}&quot;, </span>
+<span class="fc" id="L57">                       meal.getNumberOfMeals(), existingMeal.getName());</span>
+        }
+        
+<span class="fc" id="L60">        return mealRepository.save(existingMeal);</span>
+    }
+
+    public List&lt;Meal&gt; getMenusByRestaurant(Long restaurantId) {
+<span class="fc" id="L64">        logger.info(&quot;Fetching meals for restaurant with ID: {}&quot;, restaurantId);</span>
+<span class="fc" id="L65">        return mealRepository.findByRestaurantId(restaurantId);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

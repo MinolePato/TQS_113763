@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Reservation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Meals</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.models</a> &gt; <span class="el_source">Reservation.java</span></div><h1>Reservation.java</h1><pre class="source lang-java linenums">package com.example.demo.models;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.UUID;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Reservation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String reservationCode = generateReservationCode() ;
+    
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status = ReservationStatus.REGISTERED;
+
+    @ManyToOne
+    private Restaurant restaurant;
+
+    @ManyToOne
+    private Meal meal;
+
+    private String customerName;
+    public String generateReservationCode() {
+<span class="fc" id="L31">        int length = 8;</span>
+<span class="fc" id="L32">        String characters = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789&quot;;</span>
+<span class="fc" id="L33">        StringBuilder code = new StringBuilder();</span>
+    
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        for (int i = 0; i &lt; length; i++) {</span>
+<span class="fc" id="L36">            int index = (int) (Math.random() * characters.length());</span>
+<span class="fc" id="L37">            code.append(characters.charAt(index));</span>
+        }
+    
+<span class="fc" id="L40">        return code.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

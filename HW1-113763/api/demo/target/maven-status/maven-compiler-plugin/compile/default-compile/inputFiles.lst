@@ -7,6 +7,7 @@
 /home/francisco/Documents/TQS/Homework/TQS_113763/HW1-113763/api/demo/src/main/java/com/example/demo/controllers/WeatherController.java
 /home/francisco/Documents/TQS/Homework/TQS_113763/HW1-113763/api/demo/src/main/java/com/example/demo/models/Meal.java
 /home/francisco/Documents/TQS/Homework/TQS_113763/HW1-113763/api/demo/src/main/java/com/example/demo/models/Reservation.java
+/home/francisco/Documents/TQS/Homework/TQS_113763/HW1-113763/api/demo/src/main/java/com/example/demo/models/ReservationStatus.java
 /home/francisco/Documents/TQS/Homework/TQS_113763/HW1-113763/api/demo/src/main/java/com/example/demo/models/Restaurant.java
 /home/francisco/Documents/TQS/Homework/TQS_113763/HW1-113763/api/demo/src/main/java/com/example/demo/models/WeatherForecastDTO.java
 /home/francisco/Documents/TQS/Homework/TQS_113763/HW1-113763/api/demo/src/main/java/com/example/demo/repositories/MealRepository.java
